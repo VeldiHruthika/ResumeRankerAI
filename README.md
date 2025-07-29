@@ -40,7 +40,7 @@ Installation & Setup:-
 
 Clone the repository:
 
-git clone (https://github.com/VeldiHruthika/ResumeRankerA.I.) git
+git clone ((https://github.com/VeldiHruthika/ResumeRankerAI)) git
 cd ResumeRanker_AI
 
 Set up a virtual environment:
