@@ -8,12 +8,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 
 
-# Download necessary NLTK resources
 nltk.download('punkt')
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 
-# Extract plain text from a PDF file
 def extract_text_from_pdf(pdf_path):
     text = ''
     with pdfplumber.open(pdf_path) as pdf:
@@ -21,7 +19,6 @@ def extract_text_from_pdf(pdf_path):
             text += page.extract_text() or ''
     return text
 
-# Preprocess text: lowercase, remove punctuation, stopwords
 def preprocess(text):
     stop_words = set(stopwords.words('english'))
     text = text.lower().translate(str.maketrans('', '', string.punctuation))
@@ -30,9 +27,7 @@ def preprocess(text):
     filtered = [w for w in tokens if w not in stop_words]
     return ' '.join(filtered)
 
-# Core function to score and rank resumes
 def rank_resumes(jd_path, resumes_folder):
-    # Read the job description
     with open(jd_path, 'r', encoding='utf-8') as f:
         jd = f.read()
 
@@ -48,7 +43,6 @@ def rank_resumes(jd_path, resumes_folder):
             resume_texts.append(processed)
             resume_names.append(file)
 
-    # TF-IDF vectorization + similarity scoring
     all_docs = [jd_processed] + resume_texts
     vectorizer = TfidfVectorizer()
     vectors = vectorizer.fit_transform(all_docs)
