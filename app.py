@@ -23,25 +23,20 @@ def upload():
     if not os.path.exists(resumes_folder):
         os.makedirs(resumes_folder)
 
-    # Save job description to a text file
     with open('job_description.txt', 'w', encoding='utf-8') as f:
         f.write(job_desc)
 
-    # Save uploaded resumes
     files = request.files.getlist('resumes')
     for file in files:
         if file.filename.endswith('.pdf'):
             file.save(os.path.join(resumes_folder, file.filename))
 
-    # Rank resumes
     result_df = rank_resumes('job_description.txt', resumes_folder)
 
-    # Save HR report CSV
     if not os.path.exists('output'):
         os.makedirs('output')
     result_df.to_csv(OUTPUT_CSV, index=False)
 
-    # Convert to dictionary for table/chart
     records = result_df.to_dict(orient='records')
     return render_template('results.html', tables=[result_df.to_html(classes='table table-bordered table-hover', index=False)], records=records)
 
@@ -50,12 +45,10 @@ def download():
     return send_file(OUTPUT_CSV, as_attachment=True)
 
 
-# Download necessary NLTK resources
 nltk.download('punkt')
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 
-# Extract plain text from a PDF file
 def extract_text_from_pdf(pdf_path):
     text = ''
     with pdfplumber.open(pdf_path) as pdf:
@@ -63,7 +56,6 @@ def extract_text_from_pdf(pdf_path):
             text += page.extract_text() or ''
     return text
 
-# Preprocess text: lowercase, remove punctuation, stopwords
 def preprocess(text):
     stop_words = set(stopwords.words('english'))
     text = text.lower().translate(str.maketrans('', '', string.punctuation))
@@ -72,9 +64,7 @@ def preprocess(text):
     filtered = [w for w in tokens if w not in stop_words]
     return ' '.join(filtered)
 
-# Core function to score and rank resumes
 def rank_resumes(jd_path, resumes_folder):
-    # Read the job description
     with open(jd_path, 'r', encoding='utf-8') as f:
         jd = f.read()
 
@@ -90,7 +80,6 @@ def rank_resumes(jd_path, resumes_folder):
             resume_texts.append(processed)
             resume_names.append(file)
 
-    # TF-IDF vectorization + similarity scoring
     all_docs = [jd_processed] + resume_texts
     vectorizer = TfidfVectorizer()
     vectors = vectorizer.fit_transform(all_docs)
